@@ -42,9 +42,11 @@ Replace `/path/to/javafx-sdk` with the JavaFX SDK directory on your machine.
 ## Development History
 
 ### Commit 1 – Initial Project (Deliverable 2)
+Version 1.0.0
 Imported the original JavaFX calculator from Deliverable 2 with no style changes.
 
 ### Commit 2 – Checkstyle Compliance
+Version 1.0.1
 - Reformatted code to meet the Checkstyle ruleset
 - Added/expanded JavaDocs
 - Renamed variables for clarity
@@ -52,6 +54,7 @@ Imported the original JavaFX calculator from Deliverable 2 with no style chang
 - Achieved **0 Checkstyle errors/warnings**
 
 ### Commit 3 – PMD Improvements
+Version 1.0.2
 - Reduced PMD violations **from 24 to 2**
 - Made eligible locals/parameters `final`
 - Removed unused assignments/variables
