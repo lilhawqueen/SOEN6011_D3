@@ -1,6 +1,5 @@
 package calculator;
 
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -10,103 +9,96 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+/**
+ * ExponentialCalculator
+ * Version: 1.0.0
+ * Computes a × (b^x) with error handling, accessibility, and GUI best practices.
+ */
 public class ExponentialCalculator extends Application {
-    private TextField aField = new TextField();
-    private TextField bField = new TextField();
-    private TextField xField = new TextField();
-    private Label resultLabel = new Label("Result: ");
-    private Label errorLabel = new Label("");
 
-    @Override
-    public void start(Stage primaryStage) {
-        primaryStage.setTitle("a × (b^x) Calculator");
+  public static final String VERSION = "1.0.0";
 
-        GridPane grid = new GridPane();
-        grid.setPadding(new Insets(12));
-        grid.setHgap(8);
-        grid.setVgap(8);
+  private final TextField afield = new TextField();
+  private final TextField bfield = new TextField();
+  private final TextField xfield = new TextField();
+  private final Label resultLabel = new Label("Result: ");
+  private final Label errorLabel = new Label();
 
-        grid.add(new Label("a:"), 0, 0);
-        grid.add(aField, 1, 0);
-        grid.add(new Label("b (>0):"), 0, 1);
-        grid.add(bField, 1, 1);
-        grid.add(new Label("x:"), 0, 2);
-        grid.add(xField, 1, 2);
+  @Override
+  public void start(Stage primaryStage) {
+    primaryStage.setTitle("a × (b^x) Calculator v" + VERSION);
 
-        Button calcButton = new Button("Compute a × (b^x)");
-        grid.add(calcButton, 1, 3);
+    GridPane grid = new GridPane();
+    grid.setPadding(new Insets(16));
+    grid.setHgap(10);
+    grid.setVgap(10);
 
-        grid.add(resultLabel, 1, 4);
-        grid.add(errorLabel, 1, 5);
+    grid.add(new Label("Multiplier (a):"), 0, 0);
+    afield.setPromptText("e.g., 2");
+    afield.setAccessibleText("Input for multiplier a");
+    grid.add(afield, 1, 0);
 
-        calcButton.setOnAction(e -> computeAndShow());
+    grid.add(new Label("Base (b > 0):"), 0, 1);
+    bfield.setPromptText("e.g., 3");
+    bfield.setAccessibleText("Input for base b, must be > 0");
+    grid.add(bfield, 1, 1);
 
-        Scene scene = new Scene(grid, 350, 250);
-        primaryStage.setScene(scene);
-        primaryStage.show();
+    grid.add(new Label("Exponent (x):"), 0, 2);
+    xfield.setPromptText("e.g., 4");
+    xfield.setAccessibleText("Input for exponent x");
+    grid.add(xfield, 1, 2);
+
+    Button calcButton = new Button("Compute a × (b^x)");
+    calcButton.setAccessibleText("Click or press Enter to calculate a times b raised to x");
+    grid.add(calcButton, 1, 3);
+    calcButton.setDefaultButton(true);
+
+    resultLabel.setStyle("-fx-font-weight: bold;");
+    grid.add(resultLabel, 1, 4);
+
+    errorLabel.setStyle("-fx-text-fill: red;");
+    grid.add(errorLabel, 1, 5);
+
+    calcButton.setOnAction(e -> computeAndShow());
+
+    Scene scene = new Scene(grid, 420, 280);
+    primaryStage.setScene(scene);
+    primaryStage.show();
+  }
+
+  private void computeAndShow() {
+    errorLabel.setText("");
+    try {
+      double a = parseInput(afield.getText(), "a");
+      double b = parseInput(bfield.getText(), "b");
+      double x = parseInput(xfield.getText(), "x");
+      if (b <= 0) {
+        throw new IllegalArgumentException("Base (b) must be > 0.");
+      }
+      double result = a * Math.pow(b, x);
+      resultLabel.setText("Result: " + result);
+    } catch (Exception ex) {
+      resultLabel.setText("Result: ");
+      errorLabel.setText("Error: " + ex.getMessage());
     }
+  }
 
-    private void computeAndShow() {
-        errorLabel.setStyle("-fx-text-fill: red;");
-        errorLabel.setText("");
-        try {
-            double a = parseInput(aField.getText(), "a");
-            double b = parseInput(bField.getText(), "b");
-            double x = parseInput(xField.getText(), "x");
-            if (b <= 0) throw new IllegalArgumentException("b must be > 0.");
-
-            double logb = ln(b);
-            double exponent = x * logb;
-            double pow = exp(exponent);
-            double result = a * pow;
-            int intResult = (int)result;
-
-            resultLabel.setText("Result: " + result);
-        } catch (Exception ex) {
-            resultLabel.setText("Result: ");
-            errorLabel.setText("Error: " + ex.getMessage());
-        }
+  private double parseInput(String input, String varName) {
+    try {
+      return Double.parseDouble(input.trim());
+    } catch (NumberFormatException nfe) {
+      throw new IllegalArgumentException("Invalid input for " + varName + ".");
     }
-
-    private double parseInput(String input, String varName) {
-        try {
-            return Double.parseDouble(input);
-        } catch (NumberFormatException nfe) {
-            throw new IllegalArgumentException("Invalid input for " + varName + ".");
-        }
-    }
-
-    // Natural logarithm using Mercator series
-    private double ln(double z) {
-        if (z <= 0) throw new IllegalArgumentException("Cannot compute ln for b ≤ 0.");
-        double x = (z - 1) / (z + 1);
-        double x2 = x * x;
-        double sum = 0.0;
-        double denom = 1.0;
-        double term = x;
-        for (int n = 0; n < 70; n++) {
-            sum += term / denom;
-            term *= x2;
-            denom += 2.0;
-        }
-        return 2 * sum;
-    }
-
-    // Exponential function using Taylor series
-    private double exp(double y) {
-        double sum = 1.0;
-        double term = 1.0;
-        for (int n = 1; n < 30; n++) {
-            term *= y / n;
-            sum += term;
-            if (Math.abs(term) < 1e-15) break;
-        }
-        return sum;
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
+  }
+  
+  /**
+   * The entry point for the JavaFX application.
+   *
+   * @param args command-line arguments (not used)
+   */
+  public static void main(String[] args) {
+    launch(args);
+  }
 }
 
 
