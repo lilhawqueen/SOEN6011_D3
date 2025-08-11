@@ -62,4 +62,13 @@ Version 1.0.2
 - Removed empty control structures
 - Improved empty string checks and exception handling
 
+### Commit 4 - JUnit 5 test suite for core functions
+Versio 1.0.3
+- Added unit tests for ln(), exp(), and parseInput() covering:
+  • Valid inputs with expected results
+  • Edge cases (e.g., ln(1) = 0, exp(0) = 1)
+  • Invalid inputs (negative, zero for ln, NaN and non-numeric strings for parseInput)
+- Verified correctness using known Math library outputs as reference
+- Covered exception handling to ensure robustness
+- Used reflection to access parseInput() for testing without changing visibility
 
